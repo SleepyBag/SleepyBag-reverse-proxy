@@ -110,7 +110,7 @@ internal sealed class HttpForwarder : IHttpForwarder
 
             // NOTE: We heuristically assume gRPC-looking requests may require streaming semantics.
             // See https://github.com/microsoft/reverse-proxy/issues/118 for design discussion.
-            var isStreamingRequest = isClientHttp2OrGreater && ProtocolHelper.IsGrpcContentType(context.Request.ContentType);
+            // var isStreamingRequest = isClientHttp2OrGreater && ProtocolHelper.IsGrpcContentType(context.Request.ContentType);
             var isStreamingRequest = false;
 
             // :: Step 1-3: Create outgoing HttpRequestMessage
