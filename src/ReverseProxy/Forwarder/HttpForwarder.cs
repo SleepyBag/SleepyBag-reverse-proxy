@@ -259,7 +259,7 @@ internal sealed class HttpForwarder : IHttpForwarder
                     sendTime.ToString() + "\t" +
                     copyTime.ToString() + "\t" +
                     copyBackTime.ToString() + "\t" +
-                    end.ToString());
+                    end.ToString() + "\n");
             }
         }
 
