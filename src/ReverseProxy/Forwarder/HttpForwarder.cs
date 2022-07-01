@@ -245,10 +245,7 @@ internal sealed class HttpForwarder : IHttpForwarder
 
             var end = DateTime.UtcNow;
             var duration = start - end;
-            if (duration.TotalSeconds > 10)
-            {
-                await File.AppendAllTextAsync("/home/qmxue/yarp.log", start.ToString() + "\t" + duration.TotalMilliseconds.ToString());
-            }
+            await File.AppendAllTextAsync("/home/qmxue/yarp.log", start.ToString() + "\t" + duration.TotalMilliseconds.ToString());
         }
 
         return ForwarderError.None;
