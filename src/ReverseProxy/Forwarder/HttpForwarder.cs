@@ -88,6 +88,8 @@ internal sealed class HttpForwarder : IHttpForwarder
         ForwarderRequestConfig requestConfig,
         HttpTransformer transformer)
     {
+        var start = DateTime.UtcNow;
+
         _ = context ?? throw new ArgumentNullException(nameof(context));
         _ = destinationPrefix ?? throw new ArgumentNullException(nameof(destinationPrefix));
         _ = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
@@ -240,6 +242,10 @@ internal sealed class HttpForwarder : IHttpForwarder
         {
             activityCancellationSource.Return();
             ForwarderTelemetry.Log.ForwarderStop(context.Response.StatusCode);
+
+            var end = DateTime.UtcNow;
+            var duration = start - end;
+            System.Console.WriteLine(duration.TotalMilliseconds.ToString());
         }
 
         return ForwarderError.None;
