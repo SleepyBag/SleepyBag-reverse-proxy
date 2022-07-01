@@ -251,13 +251,16 @@ internal sealed class HttpForwarder : IHttpForwarder
 
             var end = DateTime.UtcNow;
             var duration = end - start;
-            await File.AppendAllTextAsync("/home/qmxue/yarp.log", 
-                duration.TotalMilliseconds.ToString() + "\t" +
-                start.ToString() + "\t" +
-                sendTime.ToString() + "\t" +
-                copyTime.ToString() + "\t" +
-                copyBackTime.ToString() + "\t" +
-                end.ToString());
+            if (duration.TotalSeconds > 10)
+            {
+                await File.AppendAllTextAsync("/home/qmxue/yarp.log",
+                    duration.TotalMilliseconds.ToString() + "\t" +
+                    start.ToString() + "\t" +
+                    sendTime.ToString() + "\t" +
+                    copyTime.ToString() + "\t" +
+                    copyBackTime.ToString() + "\t" +
+                    end.ToString());
+            }
         }
 
         return ForwarderError.None;
