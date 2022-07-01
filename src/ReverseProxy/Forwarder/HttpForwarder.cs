@@ -89,6 +89,9 @@ internal sealed class HttpForwarder : IHttpForwarder
         HttpTransformer transformer)
     {
         var start = DateTime.UtcNow;
+        var sendTime = DateTime.UtcNow;
+        var copyTime = DateTime.UtcNow;
+        var copyBackTime = DateTime.UtcNow;
 
         _ = context ?? throw new ArgumentNullException(nameof(context));
         _ = destinationPrefix ?? throw new ArgumentNullException(nameof(destinationPrefix));
@@ -118,6 +121,7 @@ internal sealed class HttpForwarder : IHttpForwarder
             var (destinationRequest, requestContent) = await CreateRequestMessageAsync(
                 context, destinationPrefix, transformer, requestConfig, isStreamingRequest, activityCancellationSource);
 
+            sendTime = DateTime.UtcNow;
             // :: Step 4: Send the outgoing request using HttpClient
             HttpResponseMessage destinationResponse;
             try
@@ -136,6 +140,7 @@ internal sealed class HttpForwarder : IHttpForwarder
 
             Log.ResponseReceived(_logger, destinationResponse);
 
+            copyTime = DateTime.UtcNow;
             try
             {
                 // :: Step 5: Copy response status line Client ◄-- Proxy ◄-- Destination
@@ -173,6 +178,7 @@ internal sealed class HttpForwarder : IHttpForwarder
                 return ForwarderError.ResponseHeaders;
             }
 
+            copyBackTime = DateTime.UtcNow;
             // :: Step 7-A: Check for a 101 upgrade response, this takes care of WebSockets as well as any other upgradeable protocol.
             if (destinationResponse.StatusCode == HttpStatusCode.SwitchingProtocols)
             {
@@ -244,8 +250,14 @@ internal sealed class HttpForwarder : IHttpForwarder
             ForwarderTelemetry.Log.ForwarderStop(context.Response.StatusCode);
 
             var end = DateTime.UtcNow;
-            var duration = start - end;
-            await File.AppendAllTextAsync("/home/qmxue/yarp.log", start.ToString() + "\t" + duration.TotalMilliseconds.ToString());
+            var duration = end - start;
+            await File.AppendAllTextAsync("/home/qmxue/yarp.log", 
+                duration.TotalMilliseconds.ToString() + "\t" +
+                start.ToString() + "\t" +
+                sendTime.ToString() + "\t" +
+                copyTime.ToString() + "\t" +
+                copyBackTime.ToString() + "\t" +
+                end.ToString());
         }
 
         return ForwarderError.None;
